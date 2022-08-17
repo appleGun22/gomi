@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"strings"
@@ -22,36 +23,32 @@ type micro struct {
 
 func main() {
 	//  open
+	if len(os.Args) <= 2 {
+		log.Fatal("go micros\nyou can find more about the usage of gomi in ")
+	}
 
 	wd, e := os.Getwd()
 	if e != nil {
-		panic(e)
+		log.Fatal(e)
 	}
 
 	gomiF, e := os.Open(wd + "\\" + os.Args[2])
 	if e != nil {
-		panic(e)
+		log.Fatal(e)
 	}
 	defer gomiF.Close()
 
 	var resFName string
-	if strings.HasSuffix(os.Args[2], "_mi.go") {
-		resFName = strings.Replace(os.Args[2], "_mi.go", ".go", 1)
-	} else if strings.HasSuffix(os.Args[2], ".gomi") {
+	if strings.HasSuffix(os.Args[2], ".gomi") {
 		resFName = strings.Replace(os.Args[2], ".gomi", ".go", 1)
 	} else {
-		panic("Warning: gomi accepts only files that end with `_mi.go` or `.gomi`")
+		log.Fatal("Warning: gomi only accepts files that end with `.gomi`")
 	}
 
 	resF, e := os.Create(resFName)
 	if e != nil {
-		panic(nil)
+		log.Fatal(e)
 	}
-	defer func() {
-		if e := resF.Close(); e != nil {
-			panic(e)
-		}
-	}()
 
 	//  search for micros
 
@@ -95,19 +92,28 @@ func main() {
 			}
 		}
 		if _, e := resF.WriteString(ln + "\n"); e != nil {
-			panic(e)
+			log.Fatal(e)
 		}
 	}
 	if e := sc.Err(); e != nil {
-		panic(e)
+		log.Fatal(e)
+	}
+
+	if e := resF.Close(); e != nil {
+		log.Fatal(e)
 	}
 
 	//  check os.Args[1], generate will only generate the file, anything else will be run in console
 	if !strings.Contains(os.Args[1], "gen") {
-		cmd := exec.Command("go", strings.Join(os.Args[1:], " "))
-		if e := cmd.Run(); e != nil {
-			fmt.Printf("\nSomething went wrong while executing go compiler: %s", e.Error())
+		cmd := exec.Command("go", os.Args[1:]...)
+		out, e := cmd.CombinedOutput()
+		if e != nil {
+			fmt.Printf("\nSomething went wrong while refering to the go compiler\n%s: %s", e.Error(), string(out))
+		} else {
+			fmt.Printf("%s", string(out))
 		}
+	} else {
+		fmt.Printf("`%s` successfully generated", resFName)
 	}
 }
 
