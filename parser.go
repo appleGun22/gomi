@@ -103,9 +103,11 @@ func main() {
 		log.Fatal(e)
 	}
 
-	//  check os.Args[1], generate will only generate the file, anything else will be run in console
+	//  check os.Args[1], gen will only generate the file, anything else will be executed in console
 	if !strings.Contains(os.Args[1], "gen") {
-		cmd := exec.Command("go", os.Args[1:]...)
+		osargs := os.Args[1:]
+		osargs[1] = resFName
+		cmd := exec.Command("go", osargs...)
 		out, e := cmd.CombinedOutput()
 		if e != nil {
 			fmt.Printf("\nSomething went wrong while refering to the go compiler\n%s: %s", e.Error(), string(out))
