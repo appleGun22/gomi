@@ -24,7 +24,7 @@ type micro struct {
 func main() {
 	//  open
 	if len(os.Args) <= 2 {
-		log.Fatal("go micros\nyou can find more about the usage of gomi in ")
+		log.Fatal("go micros\nyou can find more about the usage of gomi on https://github.com/appleGun22/gomi")
 	}
 
 	wd, e := os.Getwd()
