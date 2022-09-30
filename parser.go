@@ -38,12 +38,10 @@ func main() {
 	}
 	defer gomiF.Close()
 
-	var resFName string
-	if strings.HasSuffix(os.Args[2], ".gomi") {
-		resFName = strings.Replace(os.Args[2], ".gomi", ".go", 1)
-	} else {
+	if !strings.HasSuffix(os.Args[2], ".gomi") {
 		log.Fatal("Warning: gomi only accepts files that end with `.gomi`")
 	}
+	resFName := strings.Replace(os.Args[2], ".gomi", ".go", 1)
 
 	resF, e := os.Create(resFName)
 	if e != nil {
